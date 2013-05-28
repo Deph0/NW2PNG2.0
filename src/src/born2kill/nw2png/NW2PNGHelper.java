@@ -138,6 +138,11 @@ public class NW2PNGHelper implements Runnable {
       String source_path = getSourceFile().getAbsolutePath();
       tiledefs = new ArrayList<String[]>();
       
+      try {
+        CreateFILENAMECACHE();
+      } catch (IOException e1) {
+        e1.printStackTrace();
+      }
       CheckFILENAMECACHE();
       
       Date time = new Date();
@@ -960,6 +965,33 @@ public class NW2PNGHelper implements Runnable {
     private int[] getTileXY(int tile_number) {
         int[] tile_xy = {(tile_number % 16 + tile_number / 512 * 16) * 16, (tile_number / 16 % 32) * 16};
         return tile_xy;
+    }
+    
+    private void CreateFILENAMECACHE() throws IOException {
+      filenamecacheDir = getGraalDir();      
+      getListener().sendMessage("Creating new FILENAMECACHE.txt file in local directory " + filenamecacheDir);
+
+      FileOutputStream fos = new FileOutputStream(filenamecacheDir + File.separator + "FILENAMECACHE.txt", false);
+      PrintStream printStream = new PrintStream(fos);
+      
+      File folder = new File( filenamecacheDir + File.separator + "levels" + File.separator );
+      System.out.println(filenamecacheDir + "+" + folder.getAbsolutePath());
+      for (File fileEntry : folder.listFiles()) {
+        if (fileEntry.isDirectory()) {
+          for (File fileFolderEntry : fileEntry.listFiles()) {
+            printStream.println( fileFolderEntry.getName() );
+          }
+        }
+        else if (fileEntry.isFile()) {
+            printStream.println( fileEntry.getName() );
+        } else {
+          
+        }
+      }
+      printStream.close();
+      fos.close();
+      
+      getListener().sendMessage("Created new FILENAMECACHE.txt file in local directory");
     }
     
     private void CheckFILENAMECACHE() {
